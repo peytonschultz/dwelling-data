@@ -1,0 +1,5 @@
+This is the ingestion section of dwelling data. 
+
+Currently, the only sources of data being tracked by the project are from the zillow website.
+
+The Zillow sources update on the twelfth of each month, and the scripts run on the 13th at 6:00 am
