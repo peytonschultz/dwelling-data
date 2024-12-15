@@ -150,8 +150,14 @@ def save_file_to_ADLS(file_path, file_name, storage_account_name, storage_accoun
 
 # COMMAND ----------
 
+key = ""
+with open("../key.config") as f:
+    key = f.readline()
 
-key = "taMGH41OKScywtit3Ue6DXXMt/ikOZZcu6UghF0YIbQl7Obh77wbW9MzCouej0ils/d7Wod2OcvT+AStYLVj/Q=="
+
+# COMMAND ----------
+
+
 ## Upload both dataframes to temp-data
 index_df_melted.to_csv("../temp_data/zillow-ZHVI-clean.csv")
 market_df_melted.to_csv("../temp_data/zillow-MarketHeat-clean.csv")

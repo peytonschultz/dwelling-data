@@ -20,9 +20,6 @@
 
 # From here, save to CSV and upload to Azure.
 
-#Not secure, should change with a config file once I find this out
-key = "taMGH41OKScywtit3Ue6DXXMt/ikOZZcu6UghF0YIbQl7Obh77wbW9MzCouej0ils/d7Wod2OcvT+AStYLVj/Q=="
-
 # COMMAND ----------
 
 # Handle Imports
@@ -104,6 +101,12 @@ def save_file_to_ADLS(file_path, file_name, storage_account_name, storage_accoun
     file = open(file_path,'r')
     contents = file.read()
     file_client.upload_data(contents, overwrite=True)
+
+# COMMAND ----------
+
+key = ""
+with open("../key.config") as f:
+    key = f.readline()
 
 # COMMAND ----------
 
