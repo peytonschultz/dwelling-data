@@ -20,7 +20,8 @@
 
 # From here, save to CSV and upload to Azure.
 
-
+#Not secure, should change with a config file once I find this out
+key = "taMGH41OKScywtit3Ue6DXXMt/ikOZZcu6UghF0YIbQl7Obh77wbW9MzCouej0ils/d7Wod2OcvT+AStYLVj/Q=="
 
 # COMMAND ----------
 
@@ -106,79 +107,6 @@ def save_file_to_ADLS(file_path, file_name, storage_account_name, storage_accoun
 
 # COMMAND ----------
 
-key = "zok14WxkLHcnO4XO5CDnICknOksOzb5FFCKArpzuR0no5fIXyZqgylbZoRWJXZu3/Ew8z6eOgL7A+AStevcwOQ=="
+
 save_file_to_ADLS("../temp_data/zillow-ZHVI.csv", "zillow-ZHVI.csv", "storeassignment1", key, "raw-data")
 save_file_to_ADLS("../temp_data/zillow-MarketHeat.csv", "zillow-MarketHeat.csv", "storeassignment1", key, "raw-data")
-
-# COMMAND ----------
-
-
-
-# Melt the DataFrame
-index_df_melted = index_df.melt(id_vars=['RegionID', 'SizeRank', 'RegionName', 'RegionType', 'StateName'], 
-                                var_name='Date', 
-                                value_name='Value')
-
-# Convert 'Date' to datetime
-index_df_melted['Date'] = pd.to_datetime(index_df_melted['Date'])
-
-# Extract year and month
-index_df_melted['Year'] = index_df_melted['Date'].dt.year
-index_df_melted['Month'] = index_df_melted['Date'].dt.month
-
-display(index_df_melted)
-
-# COMMAND ----------
-
-# Melt the DataFrame
-heat_value_df_melted = market_df.melt(id_vars=['RegionID', 'SizeRank', 'RegionName', 'RegionType', 'StateName'], 
-                                var_name='Date', 
-                                value_name='Value')
-
-# Convert 'Date' to datetime
-heat_value_df_melted['Date'] = pd.to_datetime(heat_value_df_melted['Date'])
-
-# Extract year and month
-heat_value_df_melted['Year'] = heat_value_df_melted['Date'].dt.year
-heat_value_df_melted['Month'] = heat_value_df_melted['Date'].dt.month
-
-display(heat_value_df_melted)
-
-# COMMAND ----------
-
-# Join the DataFrames on 'RegionID'
-joined_df = heat_value_df_melted.merge(index_df_melted, on='RegionID', suffixes=('', '_index'))
-
-# Drop records where 'Date_heat' and 'Date_index' don't match
-joined_df = joined_df[joined_df['Date'] == joined_df['Date_index']]
-
-# Drop duplicate columns
-joined_df = joined_df.drop(columns=['SizeRank_index', 'RegionName_index','RegionType_index','StateName_index', 'Date_index','Year_index', 'Month_index'])
-
-# Rename columns
-joined_df = joined_df.rename(columns={'Value': 'Heat index', 'Value_index': 'ZHVI'})
-
-display(joined_df)
-
-# COMMAND ----------
-
-# Create a new 'ZHVI_Delta' column that represents the change in ZHVI index between two months
-joined_df['ZHVI_Delta'] = joined_df.groupby('RegionName')['ZHVI'].diff().fillna(0.0)
-
-# Create a new 'Heat_Delta' column that represents the change in ZHVI index between two months
-joined_df['Heat_Delta'] = joined_df.groupby('RegionName')['Heat index'].diff().fillna(0)
-
-display(joined_df)
-
-# COMMAND ----------
-
-## Upload both dataframes to temp-data
-index_df_melted.to_csv("../temp_data/zillow-ZHVI-clean.csv")
-heat_value_df_melted.to_csv("../temp_data/zillow-MarketHeat-clean.csv")
-joined_df.to_csv("../temp_data/zillow-joined-transform.csv")
-
-# Save to Azure
-save_file_to_ADLS("../temp_data/zillow-ZHVI-clean.csv", "zillow-ZHVI-clean.csv", "storeassignment1", key, "clean-data")
-save_file_to_ADLS("../temp_data/zillow-MarketHeat-clean.csv", "zillow-MarketHeat-clean.csv", "storeassignment1", key, "clean-data")
-save_file_to_ADLS("../temp_data/zillow-joined-transform.csv", "zillow-joined-transform.csv", "storeassignment1", key, "transformed-data")
-
