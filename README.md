@@ -40,7 +40,6 @@ Future goals include:
   <li> Publishing this information on the web</li>
 </ul>
 
-## Updates:
+# Updates:
 <div> 12-15-2024: Completed Project </div>
 
-Note - if you came here looking for assignment instructions, go to SupplementaryInfo\CourseInstructions
